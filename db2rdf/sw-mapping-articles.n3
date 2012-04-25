@@ -1,0 +1,76 @@
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix sw: <http://vocab.sciencewise.info/ontology#> .
+@prefix map: <file:/home/graphite/d2r/sw-mapping.n3#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix swrc: <http://swrc.ontoware.org/ontology#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+# Configuration for the D2R server
+<> a d2r:Server;
+    d2r:baseURI <http://localhost:2020/>;
+    d2r:port 2020;
+    .
+
+# Connection to the database
+map:database a d2rq:Database;
+	d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/swsandbox";
+	d2rq:username "swsandbox";
+	.
+
+# Article class
+map:Article a d2rq:ClassMap;
+	d2rq:dataStorage map:database;
+	d2rq:uriPattern "article/@@articles_article.article_id@@";
+	d2rq:class swrc:Publication;
+	.
+
+# Property 'title' of Article
+map:articleTitle a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Article;
+	d2rq:property dc:title;
+	d2rq:column "articles_article.title";
+	.
+
+# Property 'abstract' of Article
+# actually not very useful as a description of the resource
+#map:articleAbstract a d2rq:PropertyBridge;
+#	d2rq:belongsToClassMap map:Article;
+#	d2rq:property swrc:abstract;
+#	d2rq:column "articles_article.summary";
+#	.
+
+# Property 'keywords' of Article
+map:articleKeywords a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Article;
+	d2rq:property dc:subject;
+	d2rq:column "articles_article.keywords";
+	.
+
+# Relation 'author' between instances of Article and Author
+# note: this doesn't connect to user profiles.
+# when applicable, this link is materialised as a property of the author instance
+map:articleAuthor a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Article;
+	d2rq:property swrc:author;
+	d2rq:uriPattern "author/@@articles_articleauthor.norm_name@@-@@articles_articleauthor.id@@";
+	d2rq:join "articles_articleauthor.article_id <= articles_article.id";
+	.
+
+# Relation 'related' between instances of Article and Concept
+map:articleConcept a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Article;
+	d2rq:property skos:related;
+	d2rq:uriPattern "concept/@@concepts_concept.partial_url@@";
+	d2rq:join "stats_abbrstats.article_id = articles_article.id";
+	d2rq:join "stats_abbrstats.concept_id = concepts_concept.id";
+	.
+
+

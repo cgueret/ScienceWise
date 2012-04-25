@@ -1,0 +1,61 @@
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix sw: <http://vocab.sciencewise.info/ontology#> .
+@prefix map: <file:/home/graphite/d2r/sw-mapping.n3#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix swrc: <http://swrc.ontoware.org/ontology#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+# Configuration for the D2R server
+<> a d2r:Server;
+    d2r:baseURI <http://localhost:2020/>;
+    d2r:port 2020;
+    .
+
+# Connection to the database
+map:database a d2rq:Database;
+	d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/swsandbox";
+	d2rq:username "swsandbox";
+	.
+
+# Author class
+map:Author a d2rq:ClassMap;
+	d2rq:dataStorage map:database;
+	d2rq:uriPattern "author/@@articles_articleauthor.norm_name@@-@@articles_articleauthor.id@@";
+	d2rq:class foaf:Person;
+	.
+
+# Property 'name' of Author
+map:authorName a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Author;
+	d2rq:property foaf:name;
+	d2rq:column "articles_articleauthor.name";
+	.
+
+# Property 'identifier' of Author
+map:authorIdentifier a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Author;
+	d2rq:property dc:identifier;
+	d2rq:datatype xsd:integer;
+	d2rq:column "articles_articleauthor.id";
+	.
+
+# Property 'user' of Author
+map:authorProfile a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Author;
+	d2rq:property foaf:homepage;
+	d2rq:uriPattern "http://sciencewise.info/users/@@users_profile.partial_url@@";
+	d2rq:join "articles_articleauthor.user_id = users_profile.user_id";
+	.
+
+# Relation 'author' between instances of Author and Article
+# no need to express this here, this triple is created as part of the description of an Article
+

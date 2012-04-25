@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Silk>
+	<Prefixes>
+		<Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" />
+		<Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#" />
+		<Prefix id="foaf" namespace="http://xmlns.com/foaf/0.1/" />
+		<Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#" />
+		<Prefix id="dbpedia-owl" namespace="http://dbpedia.org/ontology/" />
+		<Prefix id="dbpedia-prop" namespace="http://dbpedia.org/property/" />
+		<Prefix id="dc" namespace="http://purl.org/dc/terms/" />
+		<Prefix id="sw" namespace="http://vocab.sciencewise.info/ontology#" />
+		<Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#" />
+	</Prefixes>
+
+	<DataSources>
+		<DataSource id="sciencewise" type="file">
+			<Param name="file" value="triples.nt" />
+			<Param name="format" value="N-TRIPLE" />
+		</DataSource>
+
+		<DataSource id="hep" type="file">
+			<Param name="file" value="HEPont.nt" />
+			<Param name="format" value="N-TRIPLE" />
+		</DataSource>
+	</DataSources>
+
+	<Interlinks>
+		<Interlink id="overlap">
+			<LinkType>owl:sameAs</LinkType>
+
+			<SourceDataset dataSource="sciencewise" var="a">
+				<RestrictTo>
+					?a rdf:type sw:Concept
+				</RestrictTo>
+			</SourceDataset>
+
+			<TargetDataset dataSource="hep" var="b">
+				<RestrictTo>
+					?b rdf:type skos:Concept
+				</RestrictTo>
+			</TargetDataset>
+
+			<LinkageRule>
+				<Aggregate type="max">
+					<Compare metric="jaro">
+						<TransformInput function="lowerCase">
+							<Input path="?a/skos:prefLabel" />
+						</TransformInput>
+						<TransformInput function="replace">
+							<TransformInput function="lowerCase">
+								<Input path="?b/skos:prefLabel" />
+							</TransformInput>
+							<Param name="search" value=":" />
+							<Param name="replace" value=" " />
+						</TransformInput>
+					</Compare>
+					<Compare metric="jaro">
+						<TransformInput function="lowerCase">
+							<Input path="?a/skos:prefLabel" />
+						</TransformInput>
+						<TransformInput function="replace">
+							<TransformInput function="lowerCase">
+								<Input path="?b/skos:altLabel" />
+							</TransformInput>
+							<Param name="search" value=":" />
+							<Param name="replace" value=" " />
+						</TransformInput>
+					</Compare>
+					<Compare metric="jaro">
+						<TransformInput function="lowerCase">
+							<Input path="?a/skos:altLabel" />
+						</TransformInput>
+						<TransformInput function="replace">
+							<TransformInput function="lowerCase">
+								<Input path="?b/skos:prefLabel" />
+							</TransformInput>
+							<Param name="search" value=":" />
+							<Param name="replace" value=" " />
+						</TransformInput>
+					</Compare>
+					<Compare metric="jaro">
+						<TransformInput function="lowerCase">
+							<Input path="?a/skos:altLabel" />
+						</TransformInput>
+						<TransformInput function="replace">
+							<TransformInput function="lowerCase">
+								<Input path="?b/skos:altLabel" />
+							</TransformInput>
+							<Param name="search" value=":" />
+							<Param name="replace" value=" " />
+						</TransformInput>
+					</Compare>
+				</Aggregate>
+			</LinkageRule>
+
+			<Filter limit="1" />
+
+			<Outputs>
+				<Output maxConfidence="0.7" type="file" >
+					<Param name="file" value="sw_hep_verify_links.xml"/>
+					<Param name="format" value="alignment"/>
+				</Output>
+				<Output minConfidence="0.8" type="file">
+					<Param name="file" value="sw_hep_accepted_links.nt"/>
+					<Param name="format" value="ntriples"/>
+				</Output>
+			</Outputs>
+		</Interlink>
+	</Interlinks>
+</Silk>

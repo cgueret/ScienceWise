@@ -1,0 +1,254 @@
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix sw: <http://vocab.sciencewise.info/ontology#> .
+@prefix map: <file:/home/graphite/d2r/sw-mapping.n3#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+
+# Configuration for the D2R server
+<> a d2r:Server;
+	d2r:baseURI <http://localhost:2020/>;
+	d2r:port 2020;
+	.
+
+# Connection to the database
+map:database a d2rq:Database;
+	d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/swsandbox";
+	d2rq:username "swsandbox";
+	.
+
+# Concept class
+map:Concept a d2rq:ClassMap;
+	d2rq:dataStorage map:database;
+	d2rq:uriPattern "concept/@@concepts_concept.partial_url@@";
+	d2rq:class sw:Concept;
+	.
+
+# Property 'main_name' of Concept
+map:conceptMainName a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:prefLabel;
+	d2rq:join "concepts_literal.id <= concepts_concept.main_name_id";
+	d2rq:column "concepts_literal.name";
+	#d2rq:lang "en";
+	.
+
+# Property 'name' of Concept
+map:conceptAltName a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:altLabel;
+	d2rq:condition "concepts_literal.id != concepts_concept.main_name_id";
+	d2rq:join "concepts_literal.concept_id <= concepts_concept.id";
+	d2rq:column "concepts_literal.name";
+	#d2rq:lang "en";
+	.
+
+# Property 'definition' of Concept
+map:conceptExternalDefinitions a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:definition;
+	d2rq:uriColumn "concepts_externalresource.url";
+	d2rq:join "concepts_externalresource.concept_id <= concepts_concept.id";
+	.
+
+# Property 'is a' of Concept
+map:conceptIsA a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property rdfs:subClassOf;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= concepts_concept.id";
+	d2rq:join "concepts_conceptrelation.object_id  => object.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 2";
+	.
+
+# Relation 'definition' between instances of Concept and Definition
+map:conceptSWDefinitions a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:definition;
+	d2rq:uriPattern "http://sciencewise.info/definitions/@@definitions_definition.partial_url@@";
+	d2rq:condition "definitions_definition.is_public = True";
+	d2rq:join "definitions_definition.concept_id <= concepts_concept.id";
+	.
+
+# Relation 'Subcategories' between instances of Concept (as seen on http://sciencewise.info/ontology/Particles)
+map:conceptSubCategory a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:member;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_concept.id <= object.category_id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "object.is_category = true";
+	.
+
+# Relation 'Concepts' between instances of Concept (as seen on http://sciencewise.info/ontology/Particles)
+map:conceptRelated a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:related;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_concept.id <= object.category_id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "object.is_category = false";
+	.
+
+# Relation 'is a specialization of' between instances of Concept
+map:conceptIsSpecializationOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:broader;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= concepts_concept.id";
+	d2rq:join "concepts_conceptrelation.object_id => object.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 14";
+	.
+
+# Relation 'is a generalization of' between instances of Concept 
+map:conceptIsGeneralizationOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:narrower;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= concepts_concept.id";
+	d2rq:join "concepts_conceptrelation.object_id => object.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 5";
+	.
+
+# Relation 'is a part of' between instances of Concept 
+map:conceptIsPartOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:member;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 1";
+	.
+
+# Relation 'is related to' between instances of Concept 
+map:conceptIsRelatedTo a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:related;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 13";
+	.
+
+# Relation 'is similar to' between instances of Concept 
+map:conceptIsSimilarTo a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property skos:closeMatch;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 6";
+	.
+
+# Relation 'is explained by' between instances of Concept 
+map:conceptIsExplainedBy a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:explainedBy;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 9";
+	.
+
+# Relation 'is important in' between instances of Concept 
+map:conceptIsImportantIn a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:importantIn;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 11";
+	.
+
+# Relation 'is used in' between instances of Concept 
+map:conceptIsUsedIn a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:usedIn;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.object_id <= object.id";
+	d2rq:join "concepts_conceptrelation.subject_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 10";
+	.
+
+# Relation 'is a manifestation of' between instances of Concept 
+map:conceptIsManifestationOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:manifestationOf;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 7";
+	.
+
+# Relation 'is a mechanism of' between instances of Concept 
+map:conceptIsMechanismOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:mechanismOf;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 4";
+	.
+
+# Relation 'is a method in' between instances of Concept 
+map:conceptIsMethodIn a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:methodIn;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 12";
+	.
+
+# Relation 'is a model of' between instances of Concept 
+map:conceptIsModelOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:modelOf;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 3";
+	.
+
+# Relation 'is a property of' between instances of Concept 
+map:conceptIsPropertyOf a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:propertyOf;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 15";
+	.
+
+# Relation 'is observed in' between instances of Concept 
+map:conceptIsObservedIn a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property sw:observedIn;
+	d2rq:refersToClassMap map:Concept;
+	d2rq:join "concepts_conceptrelation.subject_id <= object.id";
+	d2rq:join "concepts_conceptrelation.object_id => concepts_concept.id";
+	d2rq:alias "concepts_concept AS object";
+	d2rq:condition "concepts_conceptrelation.predicate_id = 8";
+	.
+
+

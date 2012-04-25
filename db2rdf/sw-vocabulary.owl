@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:vann="http://purl.org/vocab/vann/"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+  <owl:Ontology rdf:about="http://vocab.sciencewise.info/ontology">
+    <dc:title>Vocabulary of Scientific Concepts</dc:title>
+    <dc:description>This vocabulary is an RDF Schema vocabulary for expressing scientific concepts from ScienceWise ontology and different relations between them.</dc:description>
+    <dc:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-12-21</dc:modified>
+    <vann:preferredNamespaceUri>http://vocab.sciencewise.info/ontology#</vann:preferredNamespaceUri>
+    <vann:preferredNamespacePrefix>sw</vann:preferredNamespacePrefix>
+  </owl:Ontology>
+
+  <rdfs:Class rdf:about="http://vocab.sciencewise.info/ontology#Concept">
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdfs:label>concept</rdfs:label>
+    <rdfs:comment>Scientific concept.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Collection"/>
+  </rdfs:Class>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#explainedBy">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is explained by</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#importanIn">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is important in</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#usedIn">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is used in</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#manifestationOf">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is a manifestation of</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#mechanismOf">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is a mechanism of</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#methodIn">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is a method in</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#modelOf">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is a model of</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#propertyOf">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is a property of</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:about="http://vocab.sciencewise.info/ontology#observedIn">
+    <rdfs:isDefinedBy rdf:resource="http://vocab.sciencewise.info/ontology"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#semanticRelation"/>
+    <rdfs:label>is observed in</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Property>
+</rdf:RDF>
