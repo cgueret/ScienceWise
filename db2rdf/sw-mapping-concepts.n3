@@ -57,6 +57,15 @@ map:conceptExternalDefinitions a d2rq:PropertyBridge;
 	d2rq:join "concepts_externalresource.concept_id <= concepts_concept.id";
 	.
 
+# Relation owl:sameAs with DBpedia resource
+map:sameAsWikipedia a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:Concept;
+	d2rq:property owl:sameAs;
+	d2rq:join "concepts_externalresource.concept_id <= concepts_concept.id";
+	d2rq:uriSqlExpression "REPLACE(concepts_externalresource.url, 'http://en.wikipedia.org/wiki/', 'http://dbpedia.org/resource/')";
+	d2rq:condition "concepts_externalresource.url LIKE 'http://en.wikipedia.org/wiki/%' AND url NOT LIKE '%#%'";
+	.
+
 # Property 'is a' of Concept
 map:conceptIsA a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:Concept;
