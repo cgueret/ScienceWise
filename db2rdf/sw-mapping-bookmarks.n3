@@ -1,0 +1,57 @@
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix sw: <http://vocab.sciencewise.info/ontology#> .
+@prefix map: <file:/home/graphite/d2r/sw-mapping.n3#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+
+# Configuration for the D2R server
+<> a d2r:Server;
+	d2r:baseURI <http://localhost:2020/>;
+	d2r:port 2020;
+	.
+
+# Connection to the database
+map:database a d2rq:Database;
+	d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/swsandbox";
+	d2rq:username "swsandbox";
+	.
+
+# Bookmark class
+map:Bookmark a d2rq:ClassMap;
+        d2rq:dataStorage map:database;
+        d2rq:uriPattern "bookmark/@@bookmarks_articlebookmark.id@@";
+        d2rq:class sw:Bookmark;
+        .
+
+# Property 'article' of Bookmark
+map:bookmarkedArticle a d2rq:PropertyBridge;
+        d2rq:belongsToClassMap map:Bookmark;
+        d2rq:property sw:bookmarkedArticle;
+        d2rq:join "articles_articleversion.id = bookmarks_articlebookmark.version_id";
+        d2rq:join "articles_article.id = articles_articleversion.article_id";
+        d2rq:uriPattern "articles/@@articles_article.article_id@@";
+        .
+
+# Property 'user' of Bookmark
+map:userBookmarked a d2rq:PropertyBridge;
+        d2rq:belongsToClassMap map:Bookmark;
+        d2rq:property sw:userBookmarked;
+        d2rq:column "bookmarks_articlebookmark.user_id";
+        .
+
+# Bookmark tags
+map:bookmarkTag a d2rq:PropertyBridge;
+        d2rq:belongsToClassMap map:Bookmark;
+        d2rq:property skos:related;
+        d2rq:uriPattern "concept/@@concepts_concept.partial_url@@";
+        d2rq:join "bookmarks_articlebookmark.id = bookmarks_bookmarktag.bookmark_id";
+        d2rq:join "bookmarks_bookmarktag.concept_id = concepts_concept.id";
+        .
+
